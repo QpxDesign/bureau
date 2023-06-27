@@ -14,6 +14,7 @@ import {
 interface CameraViewProps {
   width: number;
   height: number;
+  handoffPhoto: Function;
 }
 
 export default function CameraView(props: CameraViewProps) {
@@ -26,16 +27,25 @@ export default function CameraView(props: CameraViewProps) {
     if (camera !== null && camera.current !== null) {
       await camera.current
         .takePhoto({
-          flash: 'on',
+          flash: 'off',
         })
         .then(p => {
           setPhoto(p);
+          props.handoffPhoto(p);
           console.log(p);
         });
     }
   }
   if (camera === null || device?.id === undefined) {
-    return <View></View>;
+    return (
+      <View
+        style={{
+          height: props.height,
+          width: props.width,
+          backgroundColor: 'black',
+          borderRadius: 25,
+        }}></View>
+    );
   }
   if (photo === undefined || photo === null) {
     return (
@@ -81,12 +91,13 @@ export default function CameraView(props: CameraViewProps) {
     );
   } else {
     return (
-      <SafeAreaView style={{}}>
+      <SafeAreaView>
         <Image
           source={{uri: photo.path}}
           style={{
-            resizeMode: 'contain',
-            height: '100%',
+            borderRadius: 25,
+            height: props.height,
+            width: props.width,
           }}
         />
       </SafeAreaView>
